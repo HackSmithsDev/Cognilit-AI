@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}{{ session.session_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('api.static', filename='css/session.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+{% endblock %}
+
+{% block content %}
+<div class="chat-interface">
+    <div id="chat-container" role="log" aria-live="polite" aria-label="Chat messages">
+        {% for msg in session.messages %}
+        {% set is_ai = msg.sender == 'agent' %}
+        
+        <div class="message-group mb-4 d-flex flex-column {{ 'align-items-start ai-message' if is_ai else 'align-items-end user-message' }}">
+            
+            {% if is_ai %}
+            <div class="d-flex align-items-center mb-2 ms-2">
+                <img src="/{{ current_user.settings_data.avatar_path }}" width="24" height="24" class="me-2 rounded-circle" alt="AI">
+                <span class="fw-bold small text-primary">{{ current_user.settings_data.nickname }}</span>
+            </div>
+            {% endif %}
+
+            <div class="message-bubble shadow-sm border {{ 'ai-bubble' if is_ai else 'user-bubble' }}">
+                
+                {# 1. ATTACHMENT HANDLING #}
+                {% if msg.file_url %}
+                    <div class="attachment-wrapper position-relative mb-2">
+                        {% if msg.file_type in ['jpg', 'jpeg', 'png', 'webp', 'gif'] %}
+                            <div class="message-image-container">
+                                <img src="{{ msg.file_url }}" 
+                                    class="rounded-3 img-fluid border shadow-sm research-img" 
+                                    onclick="window.open(this.src, '_blank')" 
+                                    alt="Research Image">
+                            </div>
+                        {% else %}
+                            <div class="attachment-file-box p-2 border rounded-3 d-flex align-items-center" 
+                                 onclick="window.open('{{ msg.file_url }}', '_blank')">
+                                
+                                {% if msg.file_type == 'pdf' %}
+                                    <i class="bi bi-file-earmark-pdf-fill text-danger fs-3 me-2"></i>
+                                {% elif msg.file_type in ['doc', 'docx'] %}
+                                    <i class="bi bi-file-earmark-word-fill text-primary fs-3 me-2"></i>
+                                {% elif msg.file_type in ['xls', 'xlsx'] %}
+                                    <i class="bi bi-file-earmark-excel-fill text-success fs-3 me-2"></i>
+                                {% else %}
+                                    <i class="bi bi-file-earmark-text-fill text-secondary fs-3 me-2"></i>
+                                {% endif %}
+                                
+                                <span class="small fw-bold text-truncate file-name-text">
+                                    {{ msg.file_url.split('/')[-1].split('_', 1)[-1] if '_' in msg.file_url.split('/')[-1] else msg.file_url.split('/')[-1] }}
+                                </span>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mt-1 vault-action-area" id="vault-container-{{ msg.chat_id }}">
+                            {% if msg.saved_doc or msg.saved_img %}
+                                <span class="text-success small fw-bold animate__animated animate__fadeIn">
+                                    <i class="bi bi-bookmark-check-fill me-1"></i> Saved to Vault
+                                </span>
+                            {% else %}
+                                <button class="btn btn-sm p-0 vault-btn hover-primary" 
+                                        onclick="saveToVault('{{ msg.chat_id }}')" 
+                                        id="save-btn-{{ msg.chat_id }}"
+                                        title="Save to Research Vault">
+                                    <i class="bi bi-bookmark-plus me-1"></i>
+                                    <span class="vault-btn-text">Save to Vault</span>
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {# 2. MESSAGE TEXT HANDLING #}
+                {% if msg.message %}
+                    <div class="message-text">
+                        {{ msg.message | safe }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <small class="text-muted mt-1 px-2 message-time">
+                {{ msg.timestamp.strftime('%I:%M %p') }}
+            </small>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="chat-input-wrapper">
+        <div class="container-fluid">
+            <div id="attachment-preview" class="d-none gap-2 px-3 mb-2" aria-live="polite"></div>
+
+            <div id="chip-container" class="d-flex gap-2 px-1 mb-2">
+                <span id="chip-pdf" class="pointer badge rounded-pill generation-chip">
+                    <i class="bi bi-file-earmark-pdf-fill me-2"></i>PDF
+                </span>
+                <span id="chip-image" class="pointer badge rounded-pill generation-chip">
+                    <i class="bi bi-image-fill me-2"></i>Images
+                </span>
+            </div>
+                        
+            <div class="chat-input-container shadow-sm d-flex align-items-center px-2 py-1">
+                <input type="file" id="hidden-file-input" class="d-none" aria-label="Upload files">
+                
+                <div class="dropup">
+                    <button class="btn btn-link text-secondary border-0 p-2" type="button" 
+                            data-bs-toggle="dropdown" aria-expanded="false" title="Attach Files">
+                        <i class="bi-paperclip fs-5"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-attach p-2 shadow border-0 rounded-4">
+                        <li><a class="dropdown-item attach-option rounded-3 py-2" href="#" data-type="doc">
+                            <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>Document</a></li>
+                        <li><a class="dropdown-item attach-option rounded-3 py-2" href="#" data-type="img">
+                            <i class="bi bi-image me-2 text-primary"></i>Image</a></li>
+                    </ul>
+                </div>
+
+                <button id="volume-toggle-btn" 
+                    class="btn {% if current_user.settings_data.dictation %} btn-primary {% else %} btn-light-theme {% endif %} rounded-circle d-flex align-items-center justify-content-center p-0 shadow-sm volume-toggle-btn" 
+                    title="Toggle Voice Response">
+                    <i class="bi {% if current_user.settings_data.dictation %} bi-volume-up-fill {% else %} bi-volume-up {% endif %} fs-5" id="volume-icon"></i>
+                </button>
+
+                <input type="text" id="chat-input-field" class="form-control border-0 shadow-none bg-transparent" 
+                       placeholder="Type your research query..." autocomplete="off">
+
+                <div id="action-button-container" class="d-flex align-items-center pe-1">
+                    <button class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center action-circle-btn" 
+                            id="voice-input-btn" title="Start Voice Input">
+                        <i class="bi bi-mic-fill" id="mic-icon"></i>
+                    </button>
+                    <button class="btn btn-primary rounded-circle d-none align-items-center justify-content-center action-circle-btn" 
+                            id="send-btn" title="Send Message">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const CURRENT_SESSION_ID = "{{ session.session_id }}";
+    const agent_name = "{{ current_user.settings_data.nickname }}";
+    const agent_avatar_path = "{{ current_user.settings_data.avatar_path }}";
+</script>
+<script src="{{ url_for('api.static', filename='js/attachments.js') }}"></script>
+<script src="{{ url_for('api.static', filename='js/helper.js') }}"></script>
+<script src="{{ url_for('api.static', filename='js/sender.js') }}"></script>
+<script src="{{ url_for('api.static', filename='js/session.js') }}"></script>
+{% endblock %}

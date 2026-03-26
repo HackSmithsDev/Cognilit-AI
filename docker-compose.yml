@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # The Flask Application
+  web:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URI=postgresql://cogni_user:password@db:5432/cognilit_db
+      - REDIS_URI=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: cogn_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: cognilit_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # Redis Cache & Limiter Storage
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:

@@ -1,0 +1,169 @@
+/* ==========================================================================
+   SUPPORT INBOX MODULE - REFINED UI
+   ========================================================================== */
+
+/* 1. Card & Container */
+.app-card {
+    background-color: var(--app-card-bg);
+    border: 1px solid var(--app-border) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* 2. Table & Rows */
+.table thead th {
+    background-color: rgba(var(--bs-primary-rgb), 0.02);
+    border-bottom: 1px solid var(--app-border);
+    letter-spacing: 0.03em;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.review-row {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    border-bottom: 1px solid var(--app-border);
+}
+
+.review-row:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.01);
+}
+
+/* 3. Resolved State */
+.resolved-opacity {
+    opacity: 0.6;
+    background-color: rgba(var(--app-text-muted), 0.03);
+    transition: opacity 0.3s ease;
+}
+
+.resolved-opacity .avatar-initial {
+    filter: grayscale(1);
+    opacity: 0.5;
+}
+
+/* 4. Avatars & User Info */
+.avatar-initial {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.user-name-container {
+    max-width: 100px;
+}
+
+@media (min-width: 768px) { .user-name-container { max-width: 180px; } }
+@media (min-width: 1200px) { .user-name-container { max-width: 260px; } }
+
+/* 5. Typography & Content Limits */
+.review-details-wrapper {
+    max-width: 300px;
+}
+
+.line-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+    color: var(--app-text-main);
+}
+
+/* 6. Custom Soft Badges */
+.bg-primary-soft { 
+    background-color: rgba(13, 110, 253, 0.08); 
+    color: #0d6efd;
+}
+
+.badge-custom {
+    font-weight: 600;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    padding: 0.5em 0.9em;
+    letter-spacing: 0.02em;
+}
+
+.badge-bug { 
+    background-color: rgba(220, 53, 69, 0.08); 
+    color: #dc3545; 
+    border: 1px solid rgba(220, 53, 69, 0.1);
+}
+
+.badge-feedback { 
+    background-color: rgba(13, 202, 240, 0.08); 
+    color: #0aa2c0; 
+    border: 1px solid rgba(13, 202, 240, 0.1);
+}
+
+/* 7. Status & Animations */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.animate-pulse {
+    animation: pulse-animation 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-animation {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.15); }
+}
+
+/* 8. Action Buttons */
+.btn-icon {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1px solid var(--app-border);
+    background: var(--app-card-bg);
+}
+
+.btn-icon:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.btn-success-soft { 
+    background-color: rgba(25, 135, 84, 0.08); 
+    color: #198754;
+    border: 1px solid rgba(25, 135, 84, 0.1);
+}
+
+.btn-success-soft:hover { 
+    background-color: #198754; 
+    color: white; 
+    border-color: #198754;
+}
+
+/* Neutral Soft Button (For Email/General Actions) */
+.btn-secondary-soft {
+    background-color: rgba(108, 117, 125, 0.12) !important;
+    color: var(--app-text-muted, #6c757d) !important;
+    border: 1px solid rgba(108, 117, 125, 0.2) !important;
+}
+
+.btn-secondary-soft:hover {
+    background-color: rgba(108, 117, 125, 0.2) !important;
+    color: var(--app-text-main, #adb5bd) !important;
+    transform: translateY(-2px);
+}
+
+/* 9. Mobile Responsiveness */
+@media (max-width: 768px) {
+    .review-details-wrapper { max-width: 150px; }
+    .avatar-initial { width: 32px; height: 32px; font-size: 0.7rem; }
+    .btn-icon { width: 34px; height: 34px; }
+    .container { padding-left: 1rem; padding-right: 1rem; }
+}

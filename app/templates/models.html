@@ -1,0 +1,203 @@
+<div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header {% if current_user.is_authenticated %}bg-success{% else %}bg-primary{% endif %} text-white">
+                <h5 class="modal-title">
+                <i class="bi {% if current_user.is_authenticated %}bi-check-circle-fill{% else %}bi-person-fill-lock{% endif %} me-2"></i>
+                {% if current_user.is_authenticated %}Welcome Back!{% else %}Login Required{% endif %}
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                {% if current_user.is_authenticated %}
+                <h4 class="text-dark">Ready to Research, {{ current_user.first_name }}?</h4>
+                <p class="text-muted">Your dashboard and AI assistant are ready for you.</p>
+                {% else %}
+                <p class="lead">Please log in to access your personalized Research with CogniLit AI.</p>
+                {% endif %}
+            </div>
+            <div class="modal-footer border-0 d-flex justify-content-center gap-2">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('home.index') }}" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-safe me-2"></i>Explore Vault
+                    </a>
+                    <button type="button" class="btn btn-success px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#initiateResearchModal">
+                        <i class="bi bi-play-fill me-1"></i>Continue Research
+                    </button>
+                {% else %}
+                    <a href="{{ url_for('home.index') }}" class="btn btn-light px-4">Just Browsing</a>
+                    <a href="{{ url_for('auth.login', next=request.args.get('next') or request.path) }}" class="btn btn-primary px-4">Login Now</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if current_user.is_authenticated %}
+<div class="modal fade" id="initiateResearchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title fw-bold"><i class="bi bi-journal-plus me-2 text-primary"></i>New Research Session</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="research-init-form" method="POST">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Select Workspace</label>
+                        <select class="form-select py-2" id="project-selector" name="project_id" required>
+                            <option value="" selected disabled>Choose a project...</option>
+                            {% for project in all_projects %}
+                            <option value="{{ project.id }}">{{ project.name }}</option>
+                            {% endfor %}
+                            <option value="NEW_PROJECT" class="fw-bold text-primary">+ Create New Project</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 d-none" id="new-project-input-group">
+                        <label for="new_project_name" class="form-label small fw-bold text-uppercase text-muted">New Project Name</label>
+                        <input type="text" class="form-control py-2 border-primary" id="new_project_name" name="project_name" placeholder="e.g., Quantum Computing 2026">
+                    </div>
+
+                    <div class="mb-0">
+                        <label for="new_session_name" class="form-label small fw-bold text-uppercase text-muted">Session Name</label>
+                        <input type="text" class="form-control py-2" id="new_session_name" name="session_name" placeholder="e.g., Literature Review" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm">Start Research</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel">
+    <div class="modal-dialog modal-dialog-centered"> <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white"> <h6 class="fw-bold mb-0"><i class="bi bi-person-gear me-2"></i>Edit Profile Details</h6>
+                <button title="dismiss" type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="form-update">
+                    <div class="row g-2 mb-3 text-start">
+                        <div class="col-md-6">
+                            <label for="signup-fname" class="form-label fw-semibold">First Name</label>
+                            <input type="text" id="signup-fname" name="first_name" class="form-control py-2" 
+                                value="{{ current_user.first_name }}" placeholder="John" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="signup-lname" class="form-label fw-semibold">Last Name</label>
+                            <input type="text" id="signup-lname" name="last_name" class="form-control py-2" 
+                                value="{{ current_user.last_name }}" placeholder="Doe" required>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3 text-start">
+                        <div class="col-md-4">
+                            <label for="signup-age" class="form-label fw-semibold">Age</label>
+                            <input type="number" id="signup-age" name="age" class="form-control py-2" 
+                                value="{{ current_user.age }}" placeholder="25" required>
+                        </div>
+                        <div class="col-md-8">
+                            <label for="signup-gender" class="form-label fw-semibold">Gender</label>
+                            <select id="signup-gender" name="gender" class="form-select py-2" required>
+                                <option value="" {% if not current_user.gender or current_user.gender == 'undefined' %}selected{% endif %} disabled>Select Gender</option>
+                                <option value="Male" {% if current_user.gender == 'Male' %}selected{% endif %}>Male</option>
+                                <option value="Female" {% if current_user.gender == 'Female' %}selected{% endif %}>Female</option>
+                                <option value="Other" {% if current_user.gender == 'Other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label for="signup-profession" class="form-label fw-semibold">Profession</label>
+                        <input type="text" id="signup-profession" name="profession" class="form-control py-2" 
+                            value="{{ current_user.profession }}" placeholder="e.g. Researcher, Student" required>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm">Update Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel">
+    <div class="modal-dialog modal-versatile modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-warning">
+                <h6 class="fw-bold mb-0"><i class="bi bi-key-fill me-2"></i>Update Password</h6>
+                <button title="dismiss" type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="password-change-form">
+                    <div class="mb-3">
+                        <label for="old-p" class="form-label small fw-bold">Current Password</label>
+                        <input type="password" class="form-control" id="old-p" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new-p" class="form-label small fw-bold">New Password</label>
+                        <input type="password" class="form-control" id="new-p" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="conf-p" class="form-label small fw-bold">Confirm New Password</label>
+                        <input type="password" class="form-control" id="conf-p" required>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100 fw-bold">Update Security</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Permanent Deletion</h5>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div class="mb-3">
+                    <i class="bi bi-trash3 text-danger fs-1"></i>
+                </div>
+                <h5 class="fw-bold mb-3">Wait! Before you go...</h5>
+                <p class="text-secondary mb-0">
+                    Deleting your account will <strong>permanently dissolve</strong> your research vault, 
+                    including all curated <strong>projects</strong>, session progress, and AI settings. 
+                    Your data will be <span class="text-danger fw-bold">lost forever.</span>
+                </p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Keep My Account</button>
+                <button type="button" id="confirm-delete-btn" class="btn btn-danger px-4 fw-bold">Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="supportModal" tabindex="-1" aria-labelledby="supportModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white p-4">
+                <h5 class="fw-bold mb-0"><i class="bi bi-headset me-2 text-primary"></i>CogniLit Help Center</h5>
+                <button title="dismiss" type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted small mb-4">Facing issues? Our team usually responds within 24 hours.</p>
+                <div class="mb-3">
+                    <label for="issue_type" class="form-label small fw-bold">What's the issue?</label>
+                    <select id="issue_type" class="form-select">
+                        <option>Technical bug on page</option>
+                        <option>Course content error</option>
+                        <option>Payment/Subscription help</option>
+                        <option>Feature Request</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="supportDetails" class="form-label small fw-bold">Details</label>
+                    <textarea id="supportDetails" class="form-control" rows="4" placeholder="How can we help?"></textarea>
+                </div>
+                <button id="submitTicketBtn" class="btn btn-primary w-100 fw-bold py-2 shadow-sm">Submit Ticket</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

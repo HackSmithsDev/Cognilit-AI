@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" 
+      data-bs-theme="{{ current_user.settings_data.theme.lower() if current_user.is_authenticated else 'light' }}"
+      data-theme-mode="{{ current_user.settings_data.theme.lower() if current_user.is_authenticated else 'auto' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CogniLit AI | {% block title %}{% endblock %}</title>
+    
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/icons/favicon.png') }}">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    {% block extra_css %}{% endblock %}
+
+     <script>
+        // IMMEDIATE THEME CHECK: Runs before the body renders to prevent white flash
+        (function() {
+            const html = document.documentElement;
+            const mode = html.getAttribute('data-theme-mode');
+            
+            if (mode === 'auto') {
+                const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                html.setAttribute('data-bs-theme', systemTheme);
+            }
+        })();
+    </script>
+</head>
+<body>
+
+    <div id="sidebar" class="sidebar-hidden d-flex flex-column shadow">
+        <div class="sidebar-header d-flex align-items-center justify-content-end p-3">
+            <button class="btn border-0 p-0 text-muted" id="menu-close" title="Close Menu" aria-label="Close Navigation Menu">
+                <i class="bi bi-x-lg fs-3"></i>
+            </button>
+        </div>
+        <div class="p-4 pt-5 flex-grow-1">
+            <!-- <h5 class="fw-bold mb-4 px-2">Research Hub</h5> -->
+            
+            <ul class="nav flex-column gap-1 list-unstyled">
+                <li class="nav-item">
+                    <a class="nav-link rounded" href="{{ url_for('home.index') }}">
+                        <i class="bi bi-house-door me-2"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded close-sidebar-btn"  href="javascript:void(0);" 
+                        {% if current_user.is_anonymous %}
+                        data-bs-toggle="modal" data-bs-target="#statusModal"
+                        {% else %}
+                        data-bs-toggle="modal" data-bs-target="#initiateResearchModal">
+                        {% endif %}
+                        <i class="bi bi-plus-circle me-2"></i> New Session
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <div class="nav-item-wrapper">
+                        <button class="nav-link btn w-100 d-flex justify-content-between align-items-center rounded border-0" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#projectWorkspacesCollapse" 
+                            aria-expanded="true" 
+                            aria-label="Toggle Project Workspaces">
+                            <span><i class="bi bi-briefcase me-2" aria-hidden="true"></i> Workspaces</span>
+                            <i class="bi bi-chevron-down small" aria-hidden="true"></i>
+                        </button>
+                        
+                        <div class="collapse show" id="projectWorkspacesCollapse">
+                            <ul class="btn-toggle-nav list-unstyled ps-4 py-2" id="sidebar-projects-list">
+                                {%- for project in all_projects -%}
+                                <li class="mb-3" id="sidebar-project-block-{{ project.id }}">
+                                    <a href="{{ url_for('api.project_view', id=project.id) }}" class="text-decoration-none">
+                                        <small class="sidebar-project-label fw-bold text-uppercase text-muted">
+                                            {{ project.name }}
+                                        </small>
+                                    </a>
+                                    <ul class="list-unstyled ps-2 mt-1 border-start border-2">
+                                        {%- for session in project.sessions -%}
+                                        <li id="sidebar-session-li-{{ session.session_id }}">
+                                            <a href="{{ url_for('api.session', id=session.session_id) }}" 
+                                                class="nav-link py-1 small text-secondary d-flex align-items-center sidebar-session-link">
+                                                <i class="bi bi-chat-left text-primary-emphasis me-2" aria-hidden="true"></i>
+                                                <span class="text-truncate">{{ session.session_name }}</span>
+                                            </a>
+                                        </li>
+                                        {%- endfor -%}
+                                    </ul>
+                                </li>
+                                {%- endfor -%}
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link rounded" href="{{ url_for('saved.vault') }}">
+                        <i class="bi bi-bookmark-star me-2"></i> Saved Vault
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer p-3 border-top">
+            <ul class="nav flex-column list-unstyled">
+                <li class="nav-item">
+                    <a class="nav-link rounded" href="{{ url_for('setting.settings') }}">
+                        <i class="bi bi-gear me-2"></i> Settings
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="main-wrapper">
+        <header class="navbar navbar-expand px-4 py-2 border-bottom sticky-top bg-body shadow-sm">
+            <div class="container-fluid">
+                <div class="d-flex align-items-center">
+                    <button class="btn border-0 p-0" id="menu-toggle" title="Open Navigation Menu" aria-label="Open Navigation Menu">
+                        <i class="bi bi-list fs-2" aria-hidden="true"></i>
+                    </button>
+                    <div class="nav-placeholder me-3"></div>
+                    <a href="/" class="navbar-brand fw-bold h1 mb-0">CogniLit AI</a>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-link text-body p-0" id="theme-toggle" title="Toggle Light/Dark Mode" aria-label="Toggle theme display">
+                        <i class="bi bi-moon-stars fs-5" aria-hidden="true"></i>
+                    </button>
+
+                    {% if current_user.is_anonymous %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Log In
+                    </a>
+                    {% else %}
+                    <div class="dropdown">
+                        <img src="/{{ current_user.profile_pic }}" 
+                            class="rounded-circle cursor-pointer border" width="38" height="38" 
+                            data-bs-toggle="dropdown" alt="User Profile">
+                        
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 p-3 dropdown-menu-profile">
+                            <li class="text-center pb-3">
+                                <div class="position-relative d-inline-block">
+                                    <img src="/{{ current_user.profile_pic }}" 
+                                        class="rounded-circle border shadow-sm avatar-large" alt="">
+                                    
+                                    <label for="avatar-upload" 
+                                        class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm cursor-pointer avatar-edit-badge" 
+                                        title="Change Profile Picture"
+                                        aria-label="Upload new profile picture">
+                                        
+                                        <i class="bi bi-camera-fill small" aria-hidden="true"></i>
+                                        
+                                        <input type="file" 
+                                            id="avatar-upload" 
+                                            name="avatar" 
+                                            class="d-none" 
+                                            accept="image/*"
+                                            title="Choose profile image"> </label>
+                                </div>
+                                
+                                <div class="mt-2">
+                                    <h6 class="mb-0 fw-bold">{{ current_user.first_name }} {{ current_user.last_name }}</h6>
+                                    <p class="text-muted small mb-0">{{ current_user.email }}</p>
+                                    <span class="badge bg-light text-primary border mt-1 badge-profession">{{ current_user.profession }}</span>
+                                </div>
+                            </li>
+
+                            <li><hr class="dropdown-divider sidebar-divider-custom"></li>
+
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2" href="#" data-bs-toggle="modal" data-bs-target="#updateModal">
+                                    <i class="bi bi-person-bounding-box me-3 text-primary"></i>Edit Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2" href="#" data-bs-toggle="modal" data-bs-target="#passwordModal">
+                                    <i class="bi bi-archive me-3 text-primary"></i>Change Password
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2" href="{{ url_for('setting.settings') }}">
+                                    <i class="bi bi-sliders2-vertical me-3 text-primary"></i>Account Settings
+                                </a>
+                            </li>
+
+                            <li><hr class="dropdown-divider mx-n3"></li>
+
+                            <li>
+                                <a class="dropdown-item text-danger rounded-3 py-2" href="javascript:void(0);" id="logout-link">
+                                    <i class="bi bi-box-arrow-left me-3"></i>Sign Out
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <div id="sidebar-overlay" class="d-none"></div>
+
+    {% include 'models.html' %}
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Injecting server-side data into global JS variables
+        window.userVoicePreference = "{{ current_user.settings_data.voice if current_user.is_authenticated else 'Nova' }}";
+        window.userLanguagePreference = "{{ current_user.settings_data.language if current_user.is_authenticated else 'English (US)' }}";
+        window.isAudioEnabled = "{{ current_user.settings_data.dictation if current_user.is_authenticated else False }}";
+    </script>
+
+    <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/model_action.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/voice_setup.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

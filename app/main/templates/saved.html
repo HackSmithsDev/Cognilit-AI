@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Research Vault{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('saved.static', filename='css/saved.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row align-items-center mb-4 g-3">
+        <div class="col-md-6">
+            <h3 class="fw-bold mb-0">Research Vault</h3>
+            <p class="text-muted small mb-0">Manage and organize your project assets</p>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="d-flex flex-wrap justify-content-md-end gap-2">
+                <div class="dropdown">
+                    <button class="btn rounded-pill px-3 dropdown-toggle custom-dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-sort-down me-2 text-primary"></i>Sort By
+                    </button>
+                    <ul class="dropdown-menu shadow border-0" id="sort-options">
+                        <li><a class="dropdown-item active" href="#" data-sort="newest">Newest First</a></li>
+                        <li><a class="dropdown-item" href="#" data-sort="oldest">Oldest First</a></li>
+                        <li><a class="dropdown-item" href="#" data-sort="alpha">Name (A-Z)</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown">
+                    <button class="btn rounded-pill px-3 dropdown-toggle custom-dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-filter me-2 text-primary"></i>File Type
+                    </button>
+                    <ul class="dropdown-menu shadow border-0" id="filter-options">
+                        <li><a class="dropdown-item active" href="#" data-filter="all">All Files</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" data-filter="pdf">PDF Documents</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="docx">Word Docs</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="image">All Images</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center mb-5">
+        <div class="nav nav-pills p-2 rounded-pill shadow-sm" role="tablist">
+            <button class="nav-link active rounded-pill px-4 fw-semibold" id="images-tab" data-bs-toggle="pill" data-bs-target="#vault-images" type="button" role="tab">
+                <i class="bi bi-image me-2"></i>Images
+            </button>
+            <button class="nav-link rounded-pill px-4 fw-semibold" id="docs-tab" data-bs-toggle="pill" data-bs-target="#vault-docs" type="button" role="tab">
+                <i class="bi bi-file-earmark-text me-2"></i>Documents
+            </button>
+        </div>
+    </div>
+
+    <div class="tab-content" id="vault-tabContent">
+        
+        <div class="tab-pane fade show active" id="vault-images" role="tabpanel">
+            <div class="row g-4" id="images-container">
+                {% for img in saved_images %}
+                <div class="col-md-4 col-lg-3 vault-item" 
+                     data-title="{{ img.title|lower }}" 
+                     data-date="{{ img.created_at.isoformat() }}"
+                     data-file-type="image">
+                    <div class="card h-100 border-0 shadow-sm gallery-card overflow-hidden">
+                        <div class="pointer img-wrapper" onclick="window.open('{{ img.file_path }}', '_blank')">
+                            <img src="{{ img.file_path }}" class="card-img-top h-100 w-100 object-fit-cover" alt="{{ img.title }}">
+                        </div>
+                        <div class="card-body p-3">
+                            <h6 class="fw-bold text-truncate mb-1" title="{{ img.title }}">{{ img.title }}</h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">{{ img.created_at.strftime('%Y-%m-%d') }}</small>
+                                <button class="btn btn-link text-danger p-0 delete-btn" data-id="{{ img.id }}" data-type="image" title="Remove from vault">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12 text-center py-5 empty-state">
+                    <i class="bi bi-images fs-1 text-light mb-3 d-block"></i>
+                    <p class="text-muted">No images found in your vault.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="vault-docs" role="tabpanel">
+            <div class="row g-4" id="docs-container">
+                {% for doc in saved_docs %}
+                <div class="col-md-6 col-lg-4 vault-item" 
+                     data-title="{{ doc.title|lower }}" 
+                     data-date="{{ doc.created_at.isoformat() }}"
+                     data-file-type="{{ doc.file_type|lower }}">
+                    <div class="card h-100 border-0 shadow-sm doc-card border-start border-primary border-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <i class="bi bi-file-earmark-text fs-3 text-primary"></i>
+                                <div class="dropdown">
+                                    <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown" title="Drop Down Button">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu shadow border-0">
+                                        <li>
+                                            {% set public_base = "https://hj8fxg8f-8000.inc1.devtunnels.ms/" %}
+                                            {% set encoded_path = doc.file_path.lstrip('/') | urlencode %}
+                                            
+                                            <a class="dropdown-item" 
+                                            {% if doc.file_type == 'pdf' %}
+                                            href="{{ doc.file_path }}"
+                                            {% else %}
+                                            href="https://view.officeapps.live.com/op/view.aspx?src={{ public_base }}{{ encoded_path }}" 
+                                            {% endif %}
+                                            target="_blank" 
+                                            rel="noopener">
+                                                <i class="bi bi-eye me-2"></i>View Online
+                                            </a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="{{ doc.file_path }}" download><i class="bi bi-download me-2"></i>Download</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><button class="dropdown-item text-danger delete-btn" data-id="{{ doc.id }}" data-type="doc">
+                                            <i class="bi bi-trash me-2"></i>Delete</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold text-truncate" title="{{ doc.title }}">{{ doc.title }}</h6>
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="badge bg-light text-primary border text-uppercase">{{ doc.file_type }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted vault-date-text">Saved on {{ doc.created_at.strftime('%b %d, %Y') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12 text-center py-5 empty-state">
+                    <i class="bi bi-file-earmark-lock fs-1 text-light mb-3 d-block"></i>
+                    <p class="text-muted">No documents found in your vault.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('saved.static', filename='js/saved.js') }}"></script>
+{% endblock %}

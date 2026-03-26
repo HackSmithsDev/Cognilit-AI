@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('setting.static', filename='css/settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Settings</h2>
+            <p class="text-muted mb-0">Preferences are saved automatically as you change them.</p>
+        </div>
+        <div id="sync-status" class="sync-indicator text-success fw-medium">
+            <i class="bi bi-cloud-check-fill me-1"></i> Changes Synced
+        </div>
+    </div>
+
+    <form id="settings-form">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header border-bottom py-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-robot me-2 text-primary"></i>AI Agent Profile</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 align-items-center mb-4">
+                            <div class="col-auto">
+                                <div class="position-relative">
+                                    <img src="/{{ current_user.settings_data.avatar_path }}" 
+                                        id="avatar-preview" class="rounded-circle border p-1" height="80" width="80" alt="Agent Avatar">
+                                    
+                                    <input type="file" id="avatar-input" class="d-none" accept="image/*" aria-label="Upload agent avatar">
+                                    
+                                    <button class="btn btn-sm btn-primary position-absolute bottom-0 end-0 rounded-circle p-1 shadow avatar-upload-btn" 
+                                            type="button" onclick="document.getElementById('avatar-input').click()" title="Change Avatar">
+                                        <i class="bi bi-camera-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <label for="agentNickname" class="form-label small fw-bold text-muted text-uppercase">Agent Nickname</label>
+                                <input type="text" class="form-control reactive-setting" id="agentNickname" name="nickname" 
+                                    value="{{ settings.nickname }}">
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="voicePersona" class="form-label small fw-bold text-muted text-uppercase">Voice Persona</label>
+                                <select class="form-select reactive-setting" id="voicePersona" name="voice">
+                                    <optgroup label="Neural Voices">
+                                        <option value="Nova" {% if settings.voice == 'Nova' %}selected{% endif %}>Nova (Natural)</option>
+                                        <option value="Echo" {% if settings.voice == 'Echo' %}selected{% endif %}>Echo (Deep)</option>
+                                        <option value="Shimmer" {% if settings.voice == 'Shimmer' %}selected{% endif %}>Shimmer (Soft)</option>
+                                        <option value="Onyx" {% if settings.voice == 'Onyx' %}selected{% endif %}>Onyx (Authoritative)</option>
+                                        <option value="Sky" {% if settings.voice == 'Sky' %}selected{% endif %}>Sky (Cheerful)</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="preferredLanguage" class="form-label small fw-bold text-muted text-uppercase">Output Language</label>
+                                <select class="form-select reactive-setting" id="preferredLanguage" name="language">
+                                    <option {% if settings.language == 'English (US)' %}selected{% endif %}>English (US)</option>
+                                    <option {% if settings.language == 'Spanish' %}selected{% endif %}>Spanish</option>
+                                    <option {% if settings.language == 'Hindi' %}selected{% endif %}>Hindi</option>
+                                </select>
+                            </div>
+                            <div class="row g-3 mt-1"> 
+                                <div class="col-12">
+                                    <div class="form-check form-switch p-3 border rounded-3 dictation-card d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <label class="form-check-label fw-bold mb-0" for="dictationSwitch">
+                                                <i class="bi bi-megaphone-fill me-2 text-primary"></i>Voice Responses
+                                            </label>
+                                            <div class="small text-muted">The AI will read its research summaries aloud.</div>
+                                        </div>
+                                        <input class="form-check-input h4 mb-0 reactive-setting" type="checkbox" role="switch" 
+                                            id="dictationSwitch" name="dictation" 
+                                            {% if settings.dictation %}checked{% endif %}>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header border-bottom py-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-cpu me-2 text-primary"></i>Research Strategy</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Response Verbosity</label>
+                            <p class="text-muted small mb-3">Determines the breadth of subjects and the depth of detail within each research chapter.</p>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check reactive-setting" name="response_length" id="v1" value="concise" {% if settings.response_length == 'concise' %}checked{% endif %}>
+                                <label class="btn btn-outline-primary py-3" for="v1"><i class="bi bi-lightning-charge d-block mb-1"></i>Concise</label>
+                                
+                                <input type="radio" class="btn-check reactive-setting" name="response_length" id="v2" value="balanced" {% if settings.response_length == 'balanced' %}checked{% endif %}>
+                                <label class="btn btn-outline-primary py-3" for="v2"><i class="bi bi-grid-1x2 d-block mb-1"></i>Balanced</label>
+
+                                <input type="radio" class="btn-check reactive-setting" name="response_length" id="v3" value="detailed" {% if settings.response_length == 'detailed' %}checked{% endif %}>
+                                <label class="btn btn-outline-primary py-3" for="v3"><i class="bi bi-book d-block mb-1"></i>Detailed</label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="form-label small fw-bold text-muted text-uppercase">Reasoning Depth</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check reactive-setting" name="mode" id="m1" value="Instant" {% if settings.mode == 'Instant' %}checked{% endif %}>
+                                <label class="btn btn-outline-secondary py-2" for="m1">Instant</label>
+                                
+                                <input type="radio" class="btn-check reactive-setting" name="mode" id="m2" value="Deep" {% if settings.mode == 'Deep' %}checked{% endif %}>
+                                <label class="btn btn-outline-secondary py-2" for="m2">Deep Thinking</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm tip-card mb-4">
+                    <div class="card-body tip-card-body">
+                        <h6 class="fw-bold mb-2"><i class="bi bi-info-circle-fill me-2"></i>Curriculum Tip</h6>
+                        <p class="small mb-0 tip-text">
+                            Your <strong>Verbosity</strong> setting directly impacts the research depth of your <strong>Projects</strong>. 
+                            Use "Detailed" for deep academic study.
+                        </p>
+                    </div>
+                </div>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3">Support & Security</h6>
+                        
+                        <button type="button" class="btn btn-light w-100 mb-2 d-flex align-items-center justify-content-between border text-start" 
+                                data-bs-toggle="modal" data-bs-target="#supportModal">
+                            <span><i class="bi bi-headset me-2 text-primary"></i>Help Center</span>
+                            <i class="bi bi-chevron-right small text-muted"></i>
+                        </button>
+
+                        <hr class="my-3 opacity-50">
+
+                        <button type="button" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-between text-start" 
+                                data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <span><i class="bi bi-trash3 me-2"></i>Delete Account</span>
+                            <i class="bi bi-chevron-right small"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('setting.static', filename='js/settings.js') }}"></script>
+{% endblock %}

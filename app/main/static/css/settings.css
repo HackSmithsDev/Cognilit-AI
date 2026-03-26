@@ -1,0 +1,172 @@
+/* ==========================================================================
+   SETTINGS THEME - CLEAN, REACTIVE & ACADEMIC
+   ========================================================================== */
+
+body {
+    background-color: var(--app-bg);
+    color: var(--app-text-main);
+    transition: background-color 0.3s ease;
+}
+
+/* Auto-Sync Indicator */
+.sync-indicator { 
+    opacity: 0; 
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translateY(10px);
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    background-color: rgba(25, 135, 84, 0.1);
+}
+
+.sync-indicator.sync-active { 
+    opacity: 1; 
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Card Styling */
+.card {
+    border: 1px solid var(--app-border) !important;
+    background-color: var(--app-card-bg) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:not(.tip-card):hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06) !important;
+}
+
+.card-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--app-border) !important;
+    padding: 1.25rem 1.5rem !important;
+}
+
+/* Avatar Section */
+#avatar-preview {
+    object-fit: cover;
+    background-color: var(--app-bg);
+    border: 2px solid var(--app-border);
+    transition: all 0.3s ease;
+    padding: 4px;
+}
+
+#avatar-preview:hover {
+    transform: rotate(3deg) scale(1.05);
+    border-color: var(--bs-primary);
+}
+
+.avatar-upload-btn {
+    border: 3px solid var(--app-card-bg) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Curriculum Tip Card (Replacing Inline Styles) */
+.tip-card {
+    position: relative;
+    z-index: 5;
+    background-color: var(--bs-primary) !important;
+    border: none !important;
+}
+
+.tip-card-body {
+    color: #ffffff !important;
+}
+
+.tip-text {
+    color: rgba(255, 255, 255, 0.95) !important;
+    opacity: 1 !important;
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    border: 1px solid var(--app-border);
+    background-color: var(--app-bg);
+    color: var(--app-text-main);
+    border-radius: 10px;
+    padding: 0.65rem 1rem;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.12);
+    background-color: var(--app-card-bg);
+}
+
+/* Buttons */
+.btn-light {
+    background-color: var(--app-bg) !important;
+    color: var(--app-text-main) !important;
+    border-color: var(--app-border) !important;
+}
+
+.btn-light:hover {
+    background-color: var(--app-border) !important;
+    border-color: var(--bs-primary) !important;
+}
+
+.btn-outline-primary {
+    border: 1px solid var(--app-border) !important;
+    color: var(--app-text-muted) !important;
+    background-color: var(--app-card-bg) !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.btn-outline-primary:hover {
+    border-color: var(--bs-primary) !important;
+    color: var(--bs-primary) !important;
+    background-color: rgba(var(--bs-primary-rgb), 0.05) !important;
+}
+
+.btn-check:checked + .btn-outline-primary,
+.btn-check:checked + .btn-outline-secondary {
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.25) !important;
+}
+
+/* Voice Switch Card */
+.dictation-card {
+    background-color: var(--app-bg) !important;
+    transition: border-color 0.2s ease;
+}
+
+[data-bs-theme="dark"] .dictation-card label {
+    color: var(--app-text-main) !important;
+}
+
+.dictation-card:hover {
+    border-color: var(--bs-primary) !important;
+}
+
+/* Danger Section */
+.btn-outline-danger {
+    border-color: var(--app-border);
+    font-weight: 500;
+}
+
+.btn-outline-danger:hover {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+    color: #b91c1c !important;
+}
+
+/* Animations */
+@keyframes scaleIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.bi-cloud-check-fill {
+    display: inline-block;
+    animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}

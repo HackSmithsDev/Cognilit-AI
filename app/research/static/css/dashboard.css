@@ -1,0 +1,135 @@
+/* ==========================================================================
+   CLEAN & LIGHT DASHBOARD THEME
+   ========================================================================== */
+
+/* 1. Global Refinement */
+body {
+    background-color: var(--app-bg);
+    color: var(--app-text-main);
+    transition: background-color 0.3s ease;
+}
+
+/* 2. Breadcrumb - Minimalist */
+.breadcrumb {
+    font-size: 0.85rem;
+    padding: 0;
+    background: transparent;
+}
+
+.breadcrumb-item a {
+    color: var(--app-text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--bs-primary);
+}
+
+.breadcrumb-item.active {
+    color: var(--app-text-main);
+    font-weight: 500;
+}
+
+/* 3. Session List - "Floating" Style */
+.list-group-item {
+    background-color: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid var(--app-border) !important;
+    padding: 1.25rem 0.75rem !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.list-group-item:last-child {
+    border-bottom: none !important;
+}
+
+/* Session Title Link Color Fix */
+.list-group-item h6 {
+    color: var(--app-text-main) !important;
+    transition: color 0.2s ease;
+}
+
+/* Subtle Hover: Slight lift and soft shadow */
+.list-group-item:hover {
+    background-color: var(--app-card-bg) !important;
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    z-index: 2;
+    border-bottom-color: transparent !important;
+}
+
+.list-group-item:hover h6 {
+    color: var(--bs-primary) !important;
+}
+
+/* 4. Action Buttons - Clean Circles */
+.list-group-item .dropdown .btn-link {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    color: var(--app-text-muted); 
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.list-group-item .dropdown .btn-link:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+    color: var(--bs-primary) !important;
+    transform: rotate(90deg);
+}
+
+/* 5. Cards - Soft & Modern */
+.card {
+    border: 1px solid var(--app-border) !important;
+    background-color: var(--app-card-bg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* Workspace Status Card (Blue Gradient) */
+.bg-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #4f46e5 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+}
+
+.bg-primary .opacity-75 {
+    letter-spacing: 0.05rem;
+    font-weight: 700;
+}
+
+/* 6. Delete Action - Low Emphasis until Hover */
+.btn-outline-danger {
+    border-color: var(--app-border);
+    color: var(--app-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-danger:hover {
+    background-color: #fef2f2 !important;
+    border-color: #fecaca !important;
+    color: #dc2626 !important;
+}
+
+/* 7. Dark Mode Fine-Tuning */
+[data-bs-theme="dark"] .list-group-item:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-danger:hover {
+    background-color: rgba(220, 38, 38, 0.1) !important;
+    color: #ff4d4d !important;
+}
+
+/* Empty State Icon */
+.text-center .bi-chat-left-dots {
+    opacity: 0.2;
+}

@@ -1,0 +1,247 @@
+/* ==========================================================================
+   1. CORE SETUP & THEME TOKENS
+   ========================================================================== */
+:root {
+    --sidebar-width: 280px;
+    --header-height: 64px;
+    --transition-speed: 0.3s;
+    
+    /* STRICT Z-INDEX LOGIC */
+    --z-sidebar: 2000;
+    --z-overlay: 2500;
+    --z-toggle: 3000;
+
+    /* Light Mode Brand Colors */
+    --app-bg: #f8fafc;
+    --app-card-bg: #ffffff;
+    --app-sidebar-bg: #ffffff;
+    --app-text-main: #0f172a;
+    --app-text-muted: #64748b;
+    --app-border: rgba(0, 0, 0, 0.06);
+}
+
+/* Dark Mode Brand Colors Override */
+[data-bs-theme="dark"] {
+    --app-bg: #0b0f19;
+    --app-card-bg: #111827;
+    --app-sidebar-bg: #111827;
+    --app-text-main: #f1f5f9;
+    --app-text-muted: #94a3b8;
+    --app-border: rgba(255, 255, 255, 0.08);
+}
+
+/* Force Bootstrap "Light" classes to respect our theme tokens in Dark Mode */
+[data-bs-theme="dark"] .bg-white,
+[data-bs-theme="dark"] .bg-light {
+    background-color: var(--app-card-bg) !important;
+    color: var(--app-text-main) !important;
+}
+[data-bs-theme="dark"] .text-dark {
+    color: var(--app-text-main) !important;
+}
+[data-bs-theme="dark"] .border {
+    border-color: var(--app-border) !important;
+}
+
+/* ANTI-FLASH & GENERAL */
+.no-transition * {
+    transition: none !important;
+}
+
+body {
+    overflow-x: hidden;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--app-bg);
+    color: var(--app-text-main);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.cursor-pointer { cursor: pointer; }
+
+/* ==========================================================================
+   2. SIDEBAR LAYOUT
+   ========================================================================== */
+#sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: var(--z-sidebar);
+    background-color: var(--app-sidebar-bg);
+    transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    overflow-y: auto;
+    border-right: 1px solid var(--app-border);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Custom Scrollbar for Sidebar */
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-thumb {
+    background: var(--app-border);
+    border-radius: 10px;
+}
+
+.sidebar-hidden { transform: translateX(-100%); }
+.sidebar-visible { transform: translateX(0); }
+
+/* Sidebar Header Elements */
+.sidebar-header {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; 
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--app-border);
+}
+
+#menu-close {
+    background: transparent;
+    border: none;
+    color: var(--app-text-muted);
+    transition: all 0.2s ease;
+}
+
+#menu-close:hover {
+    color: var(--bs-danger);
+    transform: rotate(90deg);
+}
+
+.sidebar-project-label {
+    font-weight: 700;
+    font-size: 0.68rem;
+    letter-spacing: 0.05rem;
+    text-transform: uppercase;
+    padding: 1.25rem 1.2rem 0.5rem;
+    display: block;
+    color: var(--app-text-muted);
+    opacity: 0.8;
+}
+
+/* ==========================================================================
+   3. MAIN CONTENT & OVERLAY
+   ========================================================================== */
+#main-wrapper {
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+    background-color: var(--app-bg);
+    transition: margin-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Desktop Sidebar "Push" Logic */
+@media (min-width: 992px) {
+    #sidebar.sidebar-visible + #main-wrapper {
+        margin-left: var(--sidebar-width);
+        width: calc(100% - var(--sidebar-width));
+    }
+}
+
+/* Mobile Backdrop Overlay */
+#sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    z-index: var(--z-overlay);
+    transition: opacity var(--transition-speed) ease;
+}
+
+/* ==========================================================================
+   4. NAVIGATION LINKS & SESSION LIST
+   ========================================================================== */
+.nav-link {
+    color: var(--app-text-main);
+    padding: 0.65rem 1rem;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    margin: 0.15rem 0.8rem;
+    transition: all 0.15s ease;
+    font-size: 0.92rem;
+    font-weight: 500;
+}
+
+.nav-link:hover:not(.active) {
+    background-color: rgba(var(--bs-primary-rgb), 0.08);
+    color: var(--bs-primary);
+}
+
+.nav-link.active {
+    background-color: var(--bs-primary) !important;
+    color: #fff !important;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.2);
+}
+
+/* Indented Session Links for Sidebar */
+.sidebar-session-link {
+    font-size: 0.82rem !important;
+    padding: 0.45rem 1rem 0.45rem 1.2rem !important;
+    border-radius: 0 6px 6px 0 !important;
+    margin-left: 1.2rem !important;
+    color: var(--app-text-muted) !important;
+    border-left: 2px solid var(--app-border);
+}
+
+.sidebar-session-link:hover {
+    color: var(--bs-primary) !important;
+    background-color: transparent !important;
+    border-left-color: var(--bs-primary);
+}
+
+.sidebar-session-link.active {
+    background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+    color: var(--bs-primary) !important;
+    border-left: 3px solid var(--bs-primary);
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   5. UI CONTROLS & THEME TOGGLE
+   ========================================================================== */
+#menu-toggle {
+    color: var(--app-text-main);
+    z-index: var(--z-toggle);
+}
+
+#theme-toggle i {
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ==========================================================================
+   6. PROFILE & DROPDOWNS
+   ========================================================================== */
+.dropdown-menu-profile {
+    background-color: var(--app-card-bg);
+    color: var(--app-text-main);
+    border: 1px solid var(--app-border);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    padding: 1rem;
+}
+
+.avatar-large {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--app-bg);
+    box-shadow: 0 0 0 2px var(--bs-primary);
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
