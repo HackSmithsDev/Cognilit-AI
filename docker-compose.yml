@@ -7,11 +7,11 @@ services:
     volumes:
       - .:/app
     ports:
-      - "5000:5000"
+      - "5050:5050"
     env_file:
       - .env
     environment:
-      - DATABASE_URI=postgresql://cogni_user:password@db:5432/cognilit_db
+      - DATABASE_URI=postgresql://tushar:password@db:5432/cognilit_ai
       - REDIS_URI=redis://redis:6379/0
     depends_on:
       - db
@@ -21,9 +21,9 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: cogn_user
+      POSTGRES_USER: tushar
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: cognilit_db
+      POSTGRES_DB: cognilit_ai
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:

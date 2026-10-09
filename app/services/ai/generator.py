@@ -11,6 +11,8 @@ from groq import Groq
 from docx import Document
 import openpyxl
 
+from flask import current_app
+
 logger = logging.getLogger(__name__)
 
 # --- NEW: Custom Exception for UI Feedback ---
@@ -32,9 +34,9 @@ class ResearchReport(BaseModel):
 # --- 2. Groq Provider ---
 class GroqProvider:
     def __init__(self, api_key=None):
-        self.api_key = api_key or os.getenv('GROQ_API_KEY')
+        self.api_key = api_key or current_app.config.get('GROQ_API_KEY')
         self.client = Groq(api_key=self.api_key)
-        self.model_id = "llama-3.3-70b-versatile"
+        self.model_id = current_app.config.get('GROQ_MODEL')
 
     def generate_structured_report(self, prompt: str, history: List[dict] = None, 
                                    verbosity_instruction: str = "", 
@@ -84,10 +86,10 @@ class GroqProvider:
 # --- 3. Gemini Provider ---
 class GeminiProvider:
     def __init__(self, api_key=None):
-        self.api_key = api_key or os.getenv('GEMINI_API_KEY')
+        self.api_key = api_key or current_app.config.get('GEMINI_API_KEY')
         self.client = genai.Client(api_key=self.api_key)
         # Using 2.0 Flash for stable structured output
-        self.model_id = "gemini-2.5-flash" 
+        self.model_id = current_app.config.get('GEMINI_MODEL')
 
     def generate_structured_report(self, prompt: str, history: List[dict] = None, 
                                    file_path: Optional[str] = None,

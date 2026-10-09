@@ -26,7 +26,9 @@ class Config:
 
     # --- AI Services ---
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+    GEMINI_MODEL = os.getenv('GEMINI_MODEL')
     GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+    GROQ_MODEL = os.getenv('GROQ_MODEL')
     
     # --- File Upload Configuration ---
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
