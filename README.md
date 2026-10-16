@@ -89,6 +89,17 @@ migrations/: Database schema migrations.
 
 requirements.txt: Python dependencies.
 
+🧪 **Tests**
+
+Install the development and test dependencies, then run the Flask test suite:
+
+```bash
+python -m pip install -r requirements-dev.txt
+pytest
+```
+
+`tests/conftest.py` provides an isolated SQLite database, Flask test client, and sample user fixture. Tests do not require Docker, PostgreSQL, Redis, or live email/AI credentials.
+
 🧪 **Commands Cheat Sheet**
 Task	Command
 Build & Run	docker compose up --build
