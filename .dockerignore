@@ -1,0 +1,33 @@
+# --- Python & Bytecode ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# --- Virtual Environments ---
+venv/
+.venv/
+env/
+.env
+bin/
+lib/
+
+# --- Version Control ---
+.git/
+.gitignore
+.dockerignore
+
+# --- CogniLit Specific Uploads ---
+# We ignore local uploads so the container starts clean
+app/static/uploads/user_avatars/*
+app/static/uploads/images/*
+app/static/uploads/documents/*
+instance/
+*.db
+*.sqlite
+
+# --- Build & Logs ---
+Dockerfile
+docker-compose.yml
+*.log
+.DS_Store
