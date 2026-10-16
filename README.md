@@ -31,11 +31,15 @@ Create a .env file and add your keys (see Environment Variables section below).
 2. **Launch the Stack:**
 
 Bash
-docker-compose up --build -d
-Initialize Database:
+docker compose up --build -d
 
-Bash
-docker-compose exec web flask db upgrade
+The default development configuration creates the database tables on startup. For a production deployment with a new, empty database, set `FLASK_CONFIG=production` in `.env` and apply migrations before serving requests:
+
+```bash
+docker compose exec web flask db upgrade
+```
+
+For an existing database created by the development auto-create flow, back it up and verify that its schema matches the current models before recording the baseline with `docker compose exec web flask db stamp head`. This records migration state without changing existing tables or data.
 Option 2: The Manual Way (Local Development)
 
 Use this for rapid UI/JS development.
@@ -52,21 +56,24 @@ pip install -r requirements.txt
 Database & Redis:
 Ensure you have PostgreSQL and Redis server running locally.
 
-4. **Run Migrations:**
+In development mode, the app creates the database tables on startup. For a new, empty database in production, apply migrations before serving requests:
 
-Bash
-flask db upgrade
+```bash
+FLASK_CONFIG=production flask db upgrade
+```
+
+For an existing database created by the development auto-create flow, back it up and verify that its schema matches the current models before running `FLASK_CONFIG=production flask db stamp head`. This records migration state without changing existing tables or data.
 Start App:
 
 Bash
-python run.py
+python wsgi.py
 🔑 Environment Variables (.env)
 Create a file named .env in the root folder. Never commit this file to version control.
 
 Code snippet
 SECRET_KEY=your_super_secret_key
 DATABASE_URI=postgresql://user:password@localhost:5432/cognilit_db
-REDIS_URI=redis://localhost:6379/0
+REDIS_URL=redis://localhost:6379/0
 GEMINI_API_KEY=your_google_gemini_api_key
 MAIL_USERNAME=your_email@gmail.com
 MAIL_PASSWORD=your_app_password
@@ -75,16 +82,17 @@ MAIL_PASSWORD=your_app_password
 
 config.py: Configuration classes for Dev/Prod.
 
-run.py: The entry point for the application.
+wsgi.py: The entry point for the application.
 
 Dockerfile / docker-compose.yml: Containerization settings.
+migrations/: Database schema migrations.
 
 requirements.txt: Python dependencies.
 
 🧪 **Commands Cheat Sheet**
 Task	Command
-Build & Run	docker-compose up --build
-Stop App	docker-compose down
-New Migration	flask db migrate -m "description"
-View Logs	docker-compose logs -f web
+Build & Run	docker compose up --build
+Stop App	docker compose down
+New Migration	FLASK_CONFIG=production flask db migrate -m "description"
+View Logs	docker compose logs -f web
 Interactive Shell	flask shell

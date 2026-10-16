@@ -16,6 +16,8 @@ lib/
 .git/
 .gitignore
 .dockerignore
+.env*
+!.env.example
 
 # --- CogniLit Specific Uploads ---
 # We ignore local uploads so the container starts clean

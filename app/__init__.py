@@ -68,8 +68,9 @@ def create_app(config_name='development'):
 
     # 7. Application Context Block
     with app.app_context():
+        from . import models
+
         if config_name == 'development':
-            from . import models
             db.create_all()
 
         from flask_limiter import RateLimitExceeded
