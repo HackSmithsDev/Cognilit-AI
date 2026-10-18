@@ -20,6 +20,8 @@ Option 1: The Docker Way (Recommended)
 
 This is the fastest way to get the Database, Redis, and App running perfectly synced.
 
+**Cloudflare Tunnel:** The Flask application does not depend on Cloudflare. However, the current Docker Compose file includes a `cloudflared` service and requires a valid `CLOUDFLARED_TUNNEL_TOKEN` in `.env` to use the complete Compose stack. If you do not have a Cloudflare tunnel configured, skip Docker Compose and use the manual local-development steps below; the Flask app can run without a tunnel.
+
 1. **Clone the repository:**
 
 Bash
@@ -42,7 +44,7 @@ docker compose exec web flask db upgrade
 For an existing database created by the development auto-create flow, back it up and verify that its schema matches the current models before recording the baseline with `docker compose exec web flask db stamp head`. This records migration state without changing existing tables or data.
 Option 2: The Manual Way (Local Development)
 
-Use this for rapid UI/JS development.
+Use this for rapid UI/JS development. This runs the Flask app directly and does not require a Cloudflare tunnel. Configure local PostgreSQL and Redis services as described below.
 
 3. **Create Virtual Environment:**
 
@@ -68,15 +70,7 @@ Start App:
 Bash
 python wsgi.py
 🔑 Environment Variables (.env)
-Create a file named .env in the root folder. Never commit this file to version control.
-
-Code snippet
-SECRET_KEY=your_super_secret_key
-DATABASE_URI=postgresql://user:password@localhost:5432/cognilit_db
-REDIS_URL=redis://localhost:6379/0
-GEMINI_API_KEY=your_google_gemini_api_key
-MAIL_USERNAME=your_email@gmail.com
-MAIL_PASSWORD=your_app_password
+Copy `.env.example` to `.env` and set the values for your environment. For Docker Compose, the database is named `cognilit_ai`; for manual development, set `DATABASE_URI` to the PostgreSQL database you created. `CLOUDFLARED_TUNNEL_TOKEN` is required by the current Docker Compose stack but is not needed when running the Flask app directly. Never commit the `.env` file or share its credentials.
 📂 Project Structure
 /app: Core application logic (Models, Blueprints, Static/JS).
 
