@@ -2,6 +2,7 @@ services:
   # The Flask Application
   web:
     build: .
+    container_name: cognilit_web
     volumes:
       - .:/app
     ports:
@@ -21,15 +22,17 @@ services:
         - CMD
         - python
         - -c
-        - from urllib.request import urlopen; urlopen('http://127.0.0.1:5050/', timeout=5)
+        - "from urllib.request import urlopen; urlopen('http://127.0.0.1:5050/', timeout=5)"
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
+    restart: unless-stopped
 
   # PostgreSQL Database
   db:
     image: postgres:16-alpine
+    container_name: cognilit_db
     environment:
       POSTGRES_USER: tushar
       POSTGRES_PASSWORD: password
@@ -43,10 +46,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    restart: unless-stopped
 
   # Redis Cache & Limiter Storage
   redis:
     image: redis:7-alpine
+    container_name: cognilit_redis
     ports:
       - "6379:6379"
     healthcheck:
@@ -54,6 +59,19 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    restart: unless-stopped
+
+  # Cloudflare Tunnel Ingress
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cognilit_tunnel
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARED_TUNNEL_TOKEN:?Set CLOUDFLARED_TUNNEL_TOKEN in the .env file}
+    command: tunnel --no-autoupdate run --token $$TUNNEL_TOKEN
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   postgres_data:
